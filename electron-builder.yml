@@ -1,0 +1,8 @@
+appId: com.f1dg3t.joyosc
+productName: joyOSC
+directories:
+  output: dist
+win:
+  target: nsis
+  icon: build/joyOSC.ico
+  
