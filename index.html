@@ -1,441 +1,638 @@
-<html><head><base href="https://oscillate.io/" /><title>F1dg3t's GameOSC Controller</title><style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  .main-content {
-    display: flex;
-    flex: 1;
-  }
-  .container {
-    flex: 1;
-    max-width: 800px;
-    margin-right: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  .controller-visual {
-    width: 300px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  h1, h2 {
-    color: #2c3e50;
-    text-align: center;
-  }
-  .controller-display {
-    width: 100%;
-    height: 300px;
-    background-color: #ecf0f1;
-    border: 2px solid #bdc3c7;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .button, .axis {
-    position: absolute;
-    background-color: #3498db;
-    border-radius: 5px;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 12px;
-  }
-  .axis {
-    background-color: #e74c3c;
-  }
-  .mapping-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  .mapping-item {
-    background-color: #ecf0f1;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .remove-mapping {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  .add-mapping {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-  }
-  #controllerInfo {
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: bold;
-  }
-  .osc-visual {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-  }
-  .osc-button {
-    width: 40px;
-    height: 40px;
-    background-color: #3498db;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    margin-right: 10px;
-  }
-  .osc-slider {
-    width: 200px;
-    height: 20px;
-    background-color: #ecf0f1;
-    border-radius: 10px;
-    position: relative;
-  }
-  .osc-slider-thumb {
-    width: 20px;
-    height: 20px;
-    background-color: #e74c3c;
-    border-radius: 50%;
-    position: absolute;
-    left: 0;
-  }
-  .osc-value {
-    margin-left: 10px;
-    font-weight: bold;
-  }
-  .ip-input-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .ip-input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    margin-right: 10px;
-  }
-  .ip-submit {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .invert-checkbox {
-    margin-left: 10px;
-  }
-  .invert-label {
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .controller-input {
-    margin-bottom: 10px;
-    padding: 5px;
-    background-color: #ecf0f1;
-    border-radius: 5px;
-  }
-  .controller-input-value {
-    float: right;
-    font-weight: bold;
-  }
-  .footer {
-    text-align: center;
-    margin-top: 20px;
-  }
-  .github-icon {
-    width: 32px;
-    height: 32px;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-  }
-  .github-icon:hover {
-    opacity: 1;
-  }
-</style></head><body>
-  <div class="main-content">
-    <div class="container">
-      <h1>F1dg3t's GameOSC Controller</h1>
-      
-      <div class="ip-input-container">
-        <input type="text" id="ipInput" class="ip-input" placeholder="Enter local IP address">
-        <button id="ipSubmit" class="ip-submit">Set IP</button>
-      </div>
+<html>
 
-      <div id="controllerInfo">No controller detected. Please connect a controller and press any button.</div>
-      
-      <div class="controller-display" id="controllerDisplay">
-        <!-- Controller elements will be dynamically added here -->
-      </div>
-      
-      <h2>Current Mappings</h2>
-      <ul class="mapping-list" id="mappingList">
-        <!-- Mappings will be dynamically added here -->
-      </ul>
-      
-      <button class="add-mapping" id="addMapping">Add New Mapping</button>
-    </div>
-
-    <div class="controller-visual">
-      <h2>Controller Inputs</h2>
-      <div id="controllerInputs">
-        <!-- Controller inputs will be dynamically added here -->
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <a href="#" id="github-link" target="_blank">
-      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" class="github-icon">
-    </a>
-  </div>
-
-  <script>
-    let controller = null;
-    const mappings = [];
-    let oscIpAddress = null;
-
-    function updateControllerDisplay() {
-      const display = document.getElementById('controllerDisplay');
-      display.innerHTML = '';
-      
-      if (controller) {
-        controller.buttons.forEach((button, index) => {
-          const el = document.createElement('div');
-          el.className = 'button';
-          el.style.left = (index * 40 + 10) + 'px';
-          el.style.top = '10px';
-          el.textContent = `B${index}: ${button.value.toFixed(2)}`;
-          display.appendChild(el);
-        });
-
-        controller.axes.forEach((axis, index) => {
-          const el = document.createElement('div');
-          el.className = 'axis';
-          el.style.left = (index * 80 + 10) + 'px';
-          el.style.top = '60px';
-          el.textContent = `A${index}: ${axis.toFixed(2)}`;
-          display.appendChild(el);
-        });
-      }
+<head>
+  <base href="https://oscillate.io/" />
+  <title>F1dg3t's GameOSC Controller</title>
+  <style>
+    :root {
+      --bg-color: #f0f0f0;
+      --text-color: #333;
+      --container-bg: #fff;
+      --button-bg: #3498db;
+      --axis-bg: #e74c3c;
+      --mapping-bg: #ecf0f1;
+      --remove-btn-bg: #e74c3c;
+      --add-btn-bg: #2ecc71;
+      --save-btn-bg: #3498db;
+      --load-btn-bg: #f39c12;
+      --export-btn-bg: #9b59b6;
+      --import-btn-bg: #1abc9c;
+      --slider-bg: #ecf0f1;
+      --slider-thumb-bg: #e74c3c;
     }
 
-    function updateControllerVisual() {
-      const visual = document.getElementById('controllerInputs');
-      visual.innerHTML = '';
-
-      if (controller) {
-        controller.buttons.forEach((button, index) => {
-          const el = document.createElement('div');
-          el.className = 'controller-input';
-          el.innerHTML = `Button ${index}: <span class="controller-input-value">${button.value.toFixed(2)}</span>`;
-          visual.appendChild(el);
-        });
-
-        controller.axes.forEach((axis, index) => {
-          const el = document.createElement('div');
-          el.className = 'controller-input';
-          el.innerHTML = `Axis ${index}: <span class="controller-input-value">${axis.toFixed(2)}</span>`;
-          visual.appendChild(el);
-        });
-      }
+    .dark-mode {
+      --bg-color: #2c3e50;
+      --text-color: #ecf0f1;
+      --container-bg: #34495e;
+      --button-bg: #2980b9;
+      --axis-bg: #c0392b;
+      --mapping-bg: #2c3e50;
+      --remove-btn-bg: #c0392b;
+      --add-btn-bg: #27ae60;
+      --save-btn-bg: #2980b9;
+      --load-btn-bg: #d35400;
+      --export-btn-bg: #8e44ad;
+      --import-btn-bg: #16a085;
+      --slider-bg: #7f8c8d;
+      --slider-thumb-bg: #c0392b;
     }
 
-    function renderMappings() {
-      const list = document.getElementById('mappingList');
-      list.innerHTML = '';
-      mappings.forEach((mapping, index) => {
-        const li = document.createElement('li');
-        li.className = 'mapping-item';
-        li.innerHTML = `
-          <div>
-            <span>${mapping.controllerInput} → ${mapping.oscAddress}</span>
-            <div class="osc-visual">
-              ${mapping.type === 'button' ? 
-                `<div class="osc-button">0</div>` :
-                `<div class="osc-slider"><div class="osc-slider-thumb"></div></div>`
-              }
-              <span class="osc-value">0</span>
-              ${mapping.type === 'axis' ? `
-                <label class="invert-label">
-                  <input type="checkbox" class="invert-checkbox" data-index="${index}" ${mapping.inverted ? 'checked' : ''}>
-                  Invert
-                </label>
-              ` : ''}
-            </div>
-          </div>
-          <button class="remove-mapping" data-index="${index}">Remove</button>
-        `;
-        list.appendChild(li);
-      });
-
-      // Add event listeners for invert checkboxes
-      document.querySelectorAll('.invert-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', (e) => {
-          const index = parseInt(e.target.dataset.index);
-          mappings[index].inverted = e.target.checked;
-        });
-      });
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      color: var(--text-color);
+      transition: all 0.3s ease;
     }
 
-    function addMapping() {
-      if (!controller) {
-        alert('Please connect a controller first.');
-        return;
-      }
-      
-      const inputType = prompt('Enter input type (button or axis):');
-      if (inputType !== 'button' && inputType !== 'axis') {
-        alert('Invalid input type. Please enter "button" or "axis".');
-        return;
-      }
-      
-      const inputIndex = parseInt(prompt(`Enter ${inputType} index:`));
-      if (isNaN(inputIndex) || inputIndex < 0 || 
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .container {
+      background-color: var(--container-bg);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1,
+    h2 {
+      color: var(--text-color);
+      text-align: center;
+    }
+
+    .controller-display {
+      width: 100%;
+      background-color: var(--mapping-bg);
+      border: 2px solid var(--text-color);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .button-container,
+    .axis-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    .button,
+    .axis {
+      background-color: var(--button-bg);
+      border-radius: 5px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      font-weight: bold;
+      font-size: 12px;
+      min-width: 100px;
+      height: 80px;
+      text-align: center;
+    }
+
+    .axis {
+      background-color: var(--axis-bg);
+    }
+
+    .button-index,
+    .axis-index {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+
+    .mapping-list {
+      list-style-type: none;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .mapping-item {
+      background-color: var(--mapping-bg);
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .remove-mapping {
+      background-color: var(--remove-btn-bg);
+      color: var(--text-color);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .add-mapping,
+    .save-mappings,
+    .load-mappings,
+    .export-mappings,
+    .import-mappings {
+      background-color: var(--add-btn-bg);
+      color: var(--text-color);
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      margin-right: 10px;
+    }
+
+    .save-mappings {
+      background-color: var(--save-btn-bg);
+    }
+
+    .load-mappings {
+      background-color: var(--load-btn-bg);
+    }
+
+    .export-mappings {
+      background-color: var(--export-btn-bg);
+    }
+
+    .import-mappings {
+      background-color: var(--import-btn-bg);
+    }
+
+    #controllerInfo {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .osc-visual {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .osc-button {
+      width: 40px;
+      height: 40px;
+      background-color: var(--button-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .osc-slider {
+      width: 200px;
+      height: 20px;
+      background-color: var(--slider-bg);
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .osc-slider-thumb {
+      width: 20px;
+      height: 20px;
+      background-color: var(--slider-thumb-bg);
+      border-radius: 50%;
+      position: absolute;
+      left: 0;
+    }
+
+    .osc-value {
+      margin-left: 10px;
+      font-weight: bold;
+    }
+
+    .ip-input-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .ip-submit {
+      background-color: var(--button-bg);
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .invert-checkbox {
+      margin-left: 10px;
+    }
+
+    .invert-label {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: var(--button-bg);
+      color: var(--text-color);
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/osc/2.4.1/osc-browser.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    const STANDARD_MAPPING = {
+      0: "A", 1: "B", 2: "X", 3: "Y",
+      4: "Left Bumper", 5: "Right Bumper",
+      6: "Left Trigger", 7: "Right Trigger",
+      8: "Back", 9: "Start",
+      10: "Left Stick", 11: "Right Stick",
+      12: "D-Pad Up", 13: "D-Pad Down", 14: "D-Pad Left", 15: "D-Pad Right",
+      16: "Home"
+    };
+
+    const STANDARD_AXIS_MAPPING = {
+      0: "Left Stick X", 1: "Left Stick Y",
+      2: "Right Stick X", 3: "Right Stick Y"
+    };
+
+    function App() {
+      const [controller, setController] = useState(null);
+      const [mappings, setMappings] = useState([]);
+      const [oscIpAddress, setOscIpAddress] = useState(null);
+      const [oscPort, setOscPort] = useState(8000);
+      const [darkMode, setDarkMode] = useState(false);
+      const fileInputRef = useRef(null);
+      const oscRef = useRef(null);
+
+      const scanGamepads = useCallback(() => {
+        const gamepads = navigator.getGamepads();
+        for (let i = 0; i < gamepads.length; i++) {
+          if (gamepads[i]) {
+            return gamepads[i];
+          }
+        }
+        return null;
+      }, []);
+
+      const updateGamepadState = useCallback(() => {
+        const gamepad = scanGamepads();
+        setController(gamepad);
+        requestAnimationFrame(updateGamepadState);
+      }, [scanGamepads]);
+
+      useEffect(() => {
+        updateGamepadState();
+
+        const handleGamepadConnected = (e) => {
+          console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+            e.gamepad.index, e.gamepad.id,
+            e.gamepad.buttons.length, e.gamepad.axes.length);
+        };
+
+        const handleGamepadDisconnected = (e) => {
+          console.log("Gamepad disconnected from index %d: %s",
+            e.gamepad.index, e.gamepad.id);
+          setController(null);
+        };
+
+        window.addEventListener("gamepadconnected", handleGamepadConnected);
+        window.addEventListener("gamepaddisconnected", handleGamepadDisconnected);
+
+        return () => {
+          window.removeEventListener("gamepadconnected", handleGamepadConnected);
+          window.removeEventListener("gamepaddisconnected", handleGamepadDisconnected);
+        };
+      }, [updateGamepadState]);
+
+      useEffect(() => {
+        if (oscIpAddress) {
+          oscRef.current = new OSC();
+          oscRef.current.open({ host: oscIpAddress, port: oscPort });
+        }
+        return () => {
+          if (oscRef.current) {
+            oscRef.current.close();
+          }
+        };
+      }, [oscIpAddress, oscPort]);
+
+      useEffect(() => {
+        document.body.className = darkMode ? 'dark-mode' : '';
+      }, [darkMode]);
+
+      const addMapping = () => {
+        if (!controller) {
+          alert('Please connect a controller first.');
+          return;
+        }
+
+        const inputType = prompt('Enter input type (button or axis):');
+        if (inputType !== 'button' && inputType !== 'axis') {
+          alert('Invalid input type. Please enter "button" or "axis".');
+          return;
+        }
+
+        const inputIndex = parseInt(prompt(`Enter ${inputType} index:`));
+        if (isNaN(inputIndex) || inputIndex < 0 ||
           (inputType === 'button' && inputIndex >= controller.buttons.length) ||
           (inputType === 'axis' && inputIndex >= controller.axes.length)) {
-        alert('Invalid index.');
-        return;
-      }
-      
-      const oscAddress = prompt('Enter OSC address (e.g., "/button/0", "/axis/1"):');
-      if (!oscAddress) {
-        alert('Invalid OSC address.');
-        return;
-      }
-      
-      mappings.push({
-        type: inputType,
-        controllerInput: `${inputType.charAt(0).toUpperCase() + inputType.slice(1)} ${inputIndex}`,
-        oscAddress: oscAddress,
-        index: inputIndex,
-        inverted: false
-      });
-      renderMappings();
-    }
-
-    function removeMapping(index) {
-      mappings.splice(index, 1);
-      renderMappings();
-    }
-
-    function scanGamepads() {
-      const gamepads = navigator.getGamepads();
-      for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i]) {
-          return gamepads[i];
+          alert('Invalid index.');
+          return;
         }
-      }
-      return null;
+
+        const oscAddress = prompt('Enter OSC address (e.g., "/button/0", "/axis/1"):');
+        if (!oscAddress) {
+          alert('Invalid OSC address.');
+          return;
+        }
+
+        setMappings(prevMappings => [
+          ...prevMappings,
+          {
+            type: inputType,
+            controllerInput: `${inputType === 'button' ? STANDARD_MAPPING[inputIndex] || `Button ${inputIndex}` : STANDARD_AXIS_MAPPING[inputIndex] || `Axis ${inputIndex}`}`,
+            oscAddress: oscAddress,
+            index: inputIndex,
+            inverted: false
+          }
+        ]);
+      };
+
+      const removeMapping = (index) => {
+        setMappings(prevMappings => prevMappings.filter((_, i) => i !== index));
+      };
+
+      const toggleInvert = (index) => {
+        setMappings(prevMappings => prevMappings.map((mapping, i) =>
+          i === index ? { ...mapping, inverted: !mapping.inverted } : mapping
+        ));
+      };
+
+      const setIpAddress = () => {
+        const ip = prompt('Enter OSC IP address:');
+        const port = prompt('Enter OSC port (default: 8000):');
+        if (ip) {
+          setOscIpAddress(ip);
+          setOscPort(port ? parseInt(port) : 8000);
+          alert(`OSC IP address set to: ${ip}:${port || 8000}`);
+        } else {
+          alert('Please enter a valid IP address');
+        }
+      };
+
+      const saveMappings = () => {
+        const mappingsString = JSON.stringify(mappings);
+        localStorage.setItem('gameosc-mappings', mappingsString);
+        alert('Mappings saved successfully!');
+      };
+
+      const loadMappings = () => {
+        const savedMappings = localStorage.getItem('gameosc-mappings');
+        if (savedMappings) {
+          setMappings(JSON.parse(savedMappings));
+          alert('Mappings loaded successfully!');
+        } else {
+          alert('No saved mappings found.');
+        }
+      };
+
+      const exportMappings = () => {
+        const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<mappings>
+  ${mappings.map(mapping => `
+  <mapping>
+    <type>${mapping.type}</type>
+    <controllerInput>${mapping.controllerInput}</controllerInput>
+    <oscAddress>${mapping.oscAddress}</oscAddress>
+    <index>${mapping.index}</index>
+    <inverted>${mapping.inverted}</inverted>
+  </mapping>`).join('')}
+</mappings>`;
+
+        const blob = new Blob([xmlContent], { type: 'text/xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'gameosc-mappings.xml';
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+
+      const importMappings = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const xmlContent = e.target.result;
+            const parser = new DOMParser(); const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+            const mappingElements = xmlDoc.getElementsByTagName('mapping');
+            const newMappings = Array.from(mappingElements).map(mapping => ({
+              type: mapping.getElementsByTagName('type')[0].textContent,
+              controllerInput: mapping.getElementsByTagName('controllerInput')[0].textContent,
+              oscAddress: mapping.getElementsByTagName('oscAddress')[0].textContent,
+              index: parseInt(mapping.getElementsByTagName('index')[0].textContent),
+              inverted: mapping.getElementsByTagName('inverted')[0].textContent === 'true'
+            }));
+            setMappings(newMappings);
+            alert('Mappings imported successfully!');
+          };
+          reader.readAsText(file);
+        }
+      };
+
+      const toggleDarkMode = () => {
+        setDarkMode(prevMode => !prevMode);
+      };
+
+      return (
+        <div className="main-content">
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
+          <div className="container">
+            <h1>F1dg3t's GameOSC Controller</h1>
+
+            <div className="ip-input-container">
+              <button onClick={setIpAddress} className="ip-submit">Set IP</button>
+            </div>
+
+            <div id="controllerInfo">
+              {controller
+                ? `Controller detected: ${controller.id}`
+                : 'No controller detected. Please connect a controller and press any button.'}
+            </div>
+
+            <ControllerDisplay controller={controller} />
+
+            <h2>Current Mappings</h2>
+            <MappingList
+              mappings={mappings}
+              removeMapping={removeMapping}
+              toggleInvert={toggleInvert}
+              controller={controller}
+              oscRef={oscRef}
+            />
+
+            <div className="button-group">
+              <button className="add-mapping" onClick={addMapping}>Add New Mapping</button>
+              <button className="save-mappings" onClick={saveMappings}>Save Mappings</button>
+              <button className="load-mappings" onClick={loadMappings}>Load Mappings</button>
+              <button className="export-mappings" onClick={exportMappings}>Export Mappings</button>
+              <button className="import-mappings" onClick={() => fileInputRef.current.click()}>Import Mappings</button>
+              <input
+                type="file"
+                id="fileInput"
+                ref={fileInputRef}
+                onChange={importMappings}
+                accept=".xml"
+              />
+            </div>
+          </div>
+        </div>
+      );
     }
 
-    function updateGamepadState() {
-      controller = scanGamepads();
+    function ControllerDisplay({ controller }) {
+      if (!controller) return null;
+
+      return (
+        <div className="controller-display">
+          <div className="button-container">
+            {controller.buttons.map((button, index) => (
+              <div key={`button-${index}`} className="button">
+                {STANDARD_MAPPING[index] || `Button ${index}`}
+                <br />{button.value.toFixed(2)}
+                <div className="button-index">Index: {index}</div>
+              </div>
+            ))}
+          </div>
+          <div className="axis-container">
+            {controller.axes.map((axis, index) => (
+              <div key={`axis-${index}`} className="axis">
+                {STANDARD_AXIS_MAPPING[index] || `Axis ${index}`}<br />{axis.toFixed(2)}
+                <div className="axis-index">Index: {index}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function MappingList({ mappings, removeMapping, toggleInvert, controller, oscRef }) {
+      return (
+        <ul className="mapping-list">
+          {mappings.map((mapping, index) => (
+            <MappingItem
+              key={index}
+              mapping={mapping}
+              index={index}
+              removeMapping={removeMapping}
+              toggleInvert={toggleInvert}
+              controller={controller}
+              oscRef={oscRef}
+            />
+          ))}
+        </ul>
+      );
+    }
+
+    function MappingItem({ mapping, index, removeMapping, toggleInvert, controller, oscRef }) {
+      let value = 0;
       if (controller) {
-        document.getElementById('controllerInfo').textContent = `Controller detected: ${controller.id}`;
-        updateControllerDisplay();
-        updateControllerVisual();
-        updateMappingVisuals();
-      } else {
-        document.getElementById('controllerInfo').textContent = 'No controller detected. Please connect a controller and press any button.';
-      }
-      requestAnimationFrame(updateGamepadState);
-    }
-
-    function updateMappingVisuals() {
-      const mappingItems = document.querySelectorAll('.mapping-item');
-      mappings.forEach((mapping, index) => {
-        const item = mappingItems[index];
-        const visual = item.querySelector('.osc-visual');
-        let value;
-
         if (mapping.type === 'button') {
           value = controller.buttons[mapping.index].value;
-          visual.querySelector('.osc-button').textContent = value.toFixed(2);
         } else {
           value = controller.axes[mapping.index];
           if (mapping.inverted) {
             value = -value;
           }
-          const thumb = visual.querySelector('.osc-slider-thumb');
-          thumb.style.left = `${((value + 1) / 2) * 180}px`;  // Map -1 to 1 to 0 to 180px
         }
+      }
 
-        visual.querySelector('.osc-value').textContent = value.toFixed(2);
-
-        // Here we would send the OSC message if we had a real OSC library
-        if (oscIpAddress) {
-          console.log(`Sending OSC message to ${oscIpAddress}: ${mapping.oscAddress} ${value}`);
-          // In a real implementation, we would use an OSC library to send the message
-          // oscLib.send(oscIpAddress, mapping.oscAddress, value);
+      useEffect(() => {
+        if (oscRef.current) {
+          const message = new OSC.Message(mapping.oscAddress, value);
+          oscRef.current.send(message);
         }
-      });
+      }, [value, mapping.oscAddress, oscRef]);
+
+      return (
+        <li className="mapping-item">
+          <div>
+            <span>{mapping.controllerInput} (Index: {mapping.index}) → {mapping.oscAddress}</span>
+            <div className="osc-visual">
+              {mapping.type === 'button' ? (
+                <div className="osc-button">{value.toFixed(2)}</div>
+              ) : (
+                <div className="osc-slider">
+                  <div
+                    className="osc-slider-thumb"
+                    style={{ left: `${((value + 1) / 2) * 180}px` }}
+                  />
+                </div>
+              )}
+              <span className="osc-value">{value.toFixed(2)}</span>
+              {mapping.type === 'axis' && (
+                <label className="invert-label">
+                  <input
+                    type="checkbox"
+                    className="invert-checkbox"
+                    checked={mapping.inverted}
+                    onChange={() => toggleInvert(index)}
+                  />
+                  Invert
+                </label>
+              )}
+            </div>
+          </div>
+          <button className="remove-mapping" onClick={() => removeMapping(index)}>Remove</button>
+        </li>
+      );
     }
 
-    window.addEventListener("gamepadconnected", function(e) {
-      console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-        e.gamepad.index, e.gamepad.id,
-        e.gamepad.buttons.length, e.gamepad.axes.length);
-      updateGamepadState();
-    });
-
-    window.addEventListener("gamepaddisconnected", function(e) {
-      console.log("Gamepad disconnected from index %d: %s",
-        e.gamepad.index, e.gamepad.id);
-      controller = null;
-      updateControllerDisplay();
-      updateControllerVisual();
-    });
-
-    document.getElementById('addMapping').addEventListener('click', addMapping);
-    
-    document.getElementById('mappingList').addEventListener('click', (e) => {
-      if (e.target.classList.contains('remove-mapping')) {
-        removeMapping(parseInt(e.target.dataset.index));
-      }
-    });
-
-    document.getElementById('ipSubmit').addEventListener('click', () => {
-      const ipInput = document.getElementById('ipInput');
-      const ip = ipInput.value.trim();
-      if (ip) {
-        oscIpAddress = ip;
-        alert(`OSC IP address set to: ${oscIpAddress}`);
-      } else {
-        alert('Please enter a valid IP address');
-      }
-    });
-
-    updateGamepadState();
+    ReactDOM.render(<App />, document.getElementById('root'));
   </script>
-</body></html>
+</body>
+
+</html>
